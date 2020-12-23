@@ -1,0 +1,12 @@
+{
+  "name": "tictactoe",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc Script/t3Engine.ts && tsc Tests/testEngine.ts && node Tests/testEngine.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
