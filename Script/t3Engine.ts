@@ -1,110 +1,97 @@
-type Player = "O" | "X" | " ";
+type Symbol = "O" | "X" | " ";
 
 interface Tile {
     x: number;
     y: number;
 }
 
+export class Player {
+    symbol: Symbol;
+    tiles: Tile[];
+
+    constructor(symbol: Symbol) {
+        this.symbol = symbol;
+        this.tiles = new Array<Tile>();
+    }
+}
+
 export class Board {
-    size: number;
-    private board: Player[][];
-    currentPlayer: Player;
+    private grid: Symbol[][];
+    players: Player[];
     moves: number;
     draw: boolean;
     winner: Player
     requiredStreak: number;
 
-    constructor(size: number, requiredStreak?: number) {
+    constructor(size: number, players: Player[], requiredStreak?: number) {
         if (size < 1) return;
-        this.size = size;
-        this.board = new Array<Array<Player>>();
-        this.currentPlayer = "X";
+        
+        this.grid = [];
+        for (let i = 0; i < size; i++) {
+            this.grid[i] = new Array(size);
+        }
+
+        this.players = players;
         this.moves = 0;
         this.draw = false;
-        this.winner = " ";
         this.requiredStreak = (requiredStreak != undefined) ? requiredStreak : 3;
-
-        this.init();
     }
 
     private boardIterator(rowFunc?: Function, colFunc?: Function) {
-        for (let y = 0; y < this.size; y++) {
+        for (let y = 0; y < this.grid.length; y++) {
             rowFunc(y);
-            for (let x = 0; x < this.size; x++) {
+            for (let x = 0; x < this.grid.length; x++) {
                 colFunc(x, y);
             }
         }
     }
 
-    // Kinda stupid, 
-    private init() {
-        this.boardIterator(
-            () => this.board.push([]),
-            (x, y) => this.board[y].push(" "));
-    }
-
     boardString(): String {
         let board = "";
-        
         this.boardIterator(
             () => board += "\n",
-            (x, y) => board += this.board[y][x]);
+            (x, y) => board += (this.grid[y][x] === undefined ? " " : this.grid[y][x]));
         return board;
     }
 
-    move(at: Tile): boolean {
+    move(player: Player, pos: Tile): boolean {
         // Check move is valid.
-        if (at.x < 0 || at.x >= this.size || at.y < 0 || at.y >= this.size) return false;
-        if (this.board[at.x][at.y] !== " ") return false;
+        if (pos.x < 0 || pos.x >= this.grid.length || pos.y < 0 || pos.y >= this.grid.length) return false;
+        if (this.grid[pos.x][pos.y] !== undefined) return false;
+        
 
-        // Make move and set other player as current.
-        this.board[at.x][at.y] = this.currentPlayer;
-        this.currentPlayer = (this.currentPlayer === "X" ? this.currentPlayer = "O" : this.currentPlayer = "X");
+        // Make move.
+        this.grid[pos.x][pos.y] = player.symbol;
+        player.tiles.push(pos);
         this.moves++;
 
         // Check if move resulted in a draw.
         this.checkDraw();
 
         // Check if move resulted in a win.
-        this.checkWin(this.board, 0, {x: 0, y: 0});
+        if (this.checkWin(player.tiles, player.tiles[0])) this.winner = player;
 
         return true;
     }
 
     private checkDraw(): boolean {
-        if (this.moves >= this.size**2) {
+        if (this.moves >= this.grid.length**2) {
             this.draw = true;
         }
         
         return this.draw;
     }
 
-    private checkWin(streak: number, pos: Tile): boolean {
+    private checkWin(tiles: Tile[], pred: Tile, streak = 0): number {
+        tiles.forEach(tile => {
+            let xDiff = tile.x - pred.x;
+            let yDiff = tile.y - pred.y;
+            if (Math.abs(xDiff) == 1 || Math.abs(yDiff) == 1) {
+                return this.checkWin(tiles.splice(tiles.indexOf(tile), 1), tile, streak++);
+            }
+        });
 
-        console.log("asdadsadsads");
-        
-        // Player wins!
-        if (streak === this.requiredStreak) {
-            this.winner = this.currentPlayer;
-            return true
-        };
-        
-        // Not able to get a large enough streak with remaining board.
-        if (this.size + streak < this.requiredStreak) return false;
-        
-        if (this.board[pos.y][pos.x] == this.currentPlayer) return this.checkWin()
-
+        return streak;
     }
 
-    private longestStreak(player: Player, pos = {x: 0, y: 0}, visited?: Array<Tile>): number {
-
-        if (this.board[pos.y][pos.x] != player) return 0
-
-        let right = {x: pos.x + 1, y: pos.y};
-        let down = {x: pos.x, y: pos.y + 1};
-        let diag = {x: pos.x + 1, y: pos.y + 1};
-        
-        return 1 + this.longestStreak(player, );
-
-    }
 }
