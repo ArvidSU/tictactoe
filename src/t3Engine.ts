@@ -140,10 +140,10 @@ export class Board {
         return this.draw;
     }
 
-    private checkWin(tiles: Tile[], pred: Tile, streak = 0): number {
+    private checkWin(tiles: Tile[], prev: Tile, streak = 0): number {
         tiles.forEach(tile => {
-            let xDiff = tile.x - pred.x;
-            let yDiff = tile.y - pred.y;
+            let xDiff = tile.x - prev.x;
+            let yDiff = tile.y - prev.y;
             if (Math.abs(xDiff) === 1 || Math.abs(yDiff) === 1) {
                 return this.checkWin(tiles.splice(tiles.indexOf(tile), 1), tile, streak++);
             }

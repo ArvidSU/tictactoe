@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
@@ -41,16 +40,4 @@
       "last 1 safari version"
     ]
   }
-=======
-  "name": "tictactoe",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "tsc Script/t3Engine.ts && tsc Tests/testEngine.ts && node Tests/testEngine.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
->>>>>>> main
 }
